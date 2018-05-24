@@ -11,7 +11,7 @@ namespace LeetCode
         static void Main(string[] args)
         {
             Code code = new Code();
-
+            //code.FindPoisonedDuration()
             code.FindDuplicates(new int[] { 5,4,6,7,9,3,10,9,5,6});
 
             Console.ReadLine();
