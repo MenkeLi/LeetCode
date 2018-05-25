@@ -364,13 +364,244 @@ namespace LeetCode
         /// 1.You may assume the length of given time series array won't exceed 10000.
         /// 2.You may assume the numbers in the Teemo's attacking time series and his poisoning time duration per attacking are non-
         /// negative integers, which won't exceed 10,000,000.
+        /// 主要是一个时间的重叠问题,根据数组相邻两项的差与持续时间做对比，一次来判断是否重合。注意输入数组为空的情况。
         /// </summary>
         /// <param name="timeSeries"></param>
         /// <param name="duration"></param>
         /// <returns></returns>
         public int FindPoisonedDuration(int[] timeSeries, int duration)
         {
-            return 0;
+            if (timeSeries.Length==0)
+            {
+                return 0;
+            }
+            int count = 0;
+
+            for (int i = 0; i < timeSeries.Length-1; i++)
+            {
+                if (timeSeries[i]+duration-1<timeSeries[i+1])
+                {
+                    count += duration;
+                }
+                else
+                {
+                    count += timeSeries[i + 1] - timeSeries[i];
+                }
+            }
+
+            count += duration;
+            return count;
+        }
+
+        /// <summary>
+        /// 667. Beautiful Arrangement II
+        /// Given two integers n and k, you need to construct a list which contains n different positive integers ranging from 1 to n and obeys 
+        /// the following requirement: 
+        /// Suppose this list is [a1, a2, a3, ... , an], then the list [|a1 - a2|, |a2 - a3|, |a3 - a4|, ... , |an-1 - an|] has exactly k distinct integers. 
+        ///
+        ///  If there are multiple answers, print any of them. 
+        /// 
+        /// Note:
+        /// 1.The n and k are in the range 1 <= k < n <= 10^4.
+        /// 考虑排列顺序，要符合以上要求，那么N个数最多有N-1种不同，则K必然要小于N
+        /// 考虑最大的差距来自于最大数和最小数，那么就在最开始的K个数当中，根据最小最大的顺序依次放入前面K-1个数，然后从K个数视情况为递加1或者递减1即可
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="k"></param>
+        /// <returns></returns>
+        public int[] ConstructArray(int n, int k)
+        {
+            if (k>=n||k==0)
+            {
+                return null;
+            }
+            int[] nums = new int[n];
+            for (int i = 0; i < k; i++)
+            {
+                if (i%2==0)
+                {
+                    nums[i] = i / 2 + 1;
+                }
+                else
+                {
+                    nums[i] = n - i / 2;
+                }
+            }
+            
+            for (int i = k; i < n; i++)
+            {
+                if (k%2==0)
+                {
+                    nums[i] = nums[i-1]-1;
+                }
+                else
+                {
+                    nums[i] = nums[i-1]+1;
+                }
+            }
+            return nums;
+        }
+
+
+        /// <summary>
+        /// 448. Find All Numbers Disappeared in an Array
+        /// Given an array of integers where 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once.
+        /// Find all the elements of [1, n] inclusive that do not appear in this array.
+        /// Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.
+        /// 这道题目跟之前的442寻找在一个数组中出现两次的数字是一样的思路。
+        /// 同样是利用索引来达到目的。之前把数字标负，然后当第二次指向的时候，就可以判定为是第二次指向，然后就直接把此数字加入输出的List中。
+        /// 对于现在这个题目来说，如果我们指向的位置已经为负，则不用管，否则的话，把指向的那个索引的值置为负数，然后对数组再进行一次遍历，
+        /// 那么如果值不为负，说明此索引未被指向过，则说明这就是我们要寻找的缺失的数字。顺便把为负的数值变回正数，就达到了不破坏原有数组的目的。
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <returns></returns>
+        public IList<int> FindDisappearedNumbers(int[] nums)
+        {
+            List<int> listArray = new List<int>();
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[Math.Abs(nums[i])-1] > 0)
+                {
+                    nums[Math.Abs(nums[i])-1] = -nums[Math.Abs(nums[i])-1];
+                }
+            }
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i]>0)
+                {
+                    listArray.Add(i + 1);
+                }
+                else
+                {
+                    nums[i] = -nums[i];
+                }
+            }
+            return listArray;
+        }
+
+
+        /// <summary>
+        /// 238. Product of Array Except Self
+        /// Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the product of all the elements
+        /// of nums except nums[i].
+        /// 
+        /// Note: Please solve it without division and in O(n).
+        /// 
+        /// Follow up:
+        /// Could you solve it with constant space complexity? (The output array does not count as extra space for the purpose of space complexity analysis.)
+        /// 除法的思路直接被遏制还真是。。。
+        /// 对于这个解法，只能说叹为观止
+        /// 先从左边开始，每一项等于前面所有项的乘积。然后再从右边开始，每一项等于本身与后面所有项的乘积。这样经过两次遍历，每一项就得到了除了自己以外的所有数的乘积。
+        /// 并且此解法的空间复杂度的确为常数1
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <returns></returns>
+        public int[] ProductExceptSelf(int[] nums)
+        {
+            int[] outPut = new int[nums.Length];
+            outPut[0] = 1;
+            for (int i = 1; i < outPut.Length; i++)
+            {
+                outPut[i] = outPut[i - 1] * nums[i - 1];
+            }
+
+            int right = 1;
+            for (int i = outPut.Length - 1; i >= 0; i--)
+            {
+                outPut[i] *= right;
+                right *= nums[i];
+            }
+            return outPut;
+        }
+
+
+        /// <summary>
+        /// 565. Array Nesting
+        /// A zero-indexed array A of length N contains all integers from 0 to N-1. Find and return the longest length of set S, where S[i] = {A[i], A[A
+        /// [i]], A[A[A[i]]], ... } subjected to the rule below.
+        /// 
+        /// Suppose the first element in S starts with the selection of element A[i] of index = i, the next element in S should be A[A[i]], and then A[A
+        /// [A[i]]]… By that analogy, we stop adding right before a duplicate element occurs in S.
+        /// Note:
+        /// 1.N is an integer within the range [1, 20,000].
+        /// 2.The elements of A are all distinct.
+        /// 3.Each element of A is an integer within the range [0, N-1].
+        /// 第一次尝试时，使用暴力破解，不停的指向，然后导致超时。
+        /// 改变思路，如果已经访问过的我做一次标记，然后增加一个数组用来存储已经访问过的点到最后的长度，那么就可以解决重复访问的问题了
+        /// 所以说，在解决问题中，要善于利用取反来达到标记的目的。不仅可以用于标记，也方便后续的恢复原来数组
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <returns></returns>
+        public int ArrayNesting(int[] nums)
+        {
+            int maxCount = 0;
+            int count = 0;
+            int[] countNums = new int[nums.Length];
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                int tempIndex = i;
+                count = 1;
+                while (nums[tempIndex]!=i&&nums[tempIndex]>=0)
+                {
+                    tempIndex = nums[tempIndex];
+                    count += 1;
+                }
+
+                count = count + countNums[tempIndex];
+                maxCount = Math.Max(count, maxCount);
+
+                tempIndex = i;
+                while (nums[tempIndex]!=i && nums[tempIndex] >= 0)
+                {
+                    count -= 1;
+                    countNums[nums[tempIndex]] = count;
+                    nums[tempIndex] = -nums[tempIndex];
+                    tempIndex = Math.Abs(nums[tempIndex]);
+                }
+                
+            }
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                nums[i] = Math.Abs(nums[i]);
+            }
+            return maxCount;
+        }
+
+
+        /// <summary>
+        /// 717. 1-bit and 2-bit Characters
+        /// We have two special characters. The first character can be represented by one bit 0. The second character can be represented by two
+        /// bits (10 or 11). 
+        /// Now given a string represented by several bits. Return whether the last character must be a one-bit character or not. The given string 
+        /// will always end with a zero.
+        /// 
+        /// Note: 
+        /// 1 &lt;= len(bits) &lt;= 1000.
+        /// bits[i] is always 0 or 1.
+        /// 
+        /// 经过观察可以知道，如果一旦遇到了一个1，那么这一位与接下来那一位一定是第2种编码，所以就直接跳到下一位的下一位，直到遍历整个数组。
+        /// 如果在倒数第二位遇到了1，那么我们就可以判定最后两位一定是第2中编码，因此返回False,否则返回True
+        /// </summary>
+        /// <param name="bits"></param>
+        /// <returns></returns>
+        public bool IsOneBitCharacter(int[] bits)
+        {
+            for (int i = 0; i < bits.Length; i++)
+            {
+                if (bits[i]==1)
+                {
+                    i += 1;
+                    if (i == bits.Length-1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
