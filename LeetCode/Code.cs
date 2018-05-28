@@ -603,5 +603,211 @@ namespace LeetCode
             }
             return true;
         }
+
+
+        /// <summary>
+        /// 830. Positions of Large Groups
+        /// In a string S of lowercase letters, these letters form consecutive groups of the same character.
+        /// For example, a string like S = "abbxxxxzyy" has the groups "a", "bb", "xxxx", "z" and "yy".
+        /// Call a group large if it has 3 or more characters.  We would like the starting and ending positions of every large group.
+        /// The final answer should be in lexicographic order.
+        /// 
+        /// Note:  1 <= S.length <= 1000
+        /// 
+        /// 题目最开始主要是遇到了数据结构转换的问题List<list<int>>是不被认可的，无奈之下，只能最后认为转一次数组
+        /// 其次是界限的判断问题，主要思路是判断下一个值是否跟当前值一样，但是很容易忽略是否有下一个值
+        /// </summary>
+        /// <param name="S"></param>
+        /// <returns></returns>
+        public IList<IList<int>> LargeGroupPositions(string S)
+        {
+            List<int[]> ssss = new List<int[]>();
+            int endIndex = 1;
+            int count = 1;
+            char[] chars = S.ToArray();
+            for (int i = 0; i < chars.Length - 1; i++)
+            {
+                if (chars[i + 1] == chars[i])
+                {
+                    count += 1;
+                    if (i==chars.Length-2&&count>=3)
+                    {
+                        endIndex = i+1;
+                        ssss.Add(new int[] { endIndex - count + 1, endIndex });
+                    }
+                }
+                else
+                {
+                    if (count >= 3)
+                    {
+                        endIndex = i;
+                        ssss.Add(new int[] { endIndex - count + 1, endIndex });
+                    }
+
+                    count = 1;
+                }
+
+            }
+            int[][] oders = new int[ssss.Count][];
+            for (int i = 0; i < ssss.Count; i++)
+            {
+                oders[i] = ssss[i].ToArray();
+            }
+            return oders;
+
+        }
+
+
+        /// <summary>
+        /// 169. Majority Element
+        /// Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times.
+        /// You may assume that the array is non-empty and the majority element always exist in the array.
+        /// 刚开始没想到什么太好的办法，只能采用暴力解题。然而第一次尝试还是忘记了边界的问题，当长度只有一个的时候的情况没能考虑进去。以后一定要对这些边界多考虑一下。
+        /// 其次加了一种标记办法，即创建一个跟它同样的数组，然后用bool值来进行标记，时间复杂度同样太高。注意到了n/2这个提示，但是没想到怎么利用。
+        /// 现在的解题办法，充分利用了N/2的这个提示，
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <returns></returns>
+        public int MajorityElement(int[] nums)
+        {
+            int major = nums[0], count = 1;
+            for (int i = 1; i < nums.Length; i++)
+            {
+                if (count == 0)
+                {
+                    count++;
+                    major = nums[i];
+                }
+                else if (major == nums[i])
+                {
+                    count++;
+                }
+                else count--;
+
+            }
+            return major;
+
+
+            //这是一个时间复杂度很高的解决办法，不采用
+            //int temp = 0;
+            //int count = 1;
+            //int maxCount = 1;
+            //int maxOutput = 0;
+            //if (nums.Length==1)
+            //{
+            //    return nums[0];
+            //}
+            //for (int i = 0; i < (nums.Length+1)/2; i++)
+            //{
+            //    count = 1;
+            //    temp = nums[i];
+            //    for (int j = i+1; j < nums.Length; j++)
+            //    {
+            //        if (nums[j]==temp)
+            //        {
+            //            count += 1;
+            //        }
+            //    }
+
+            //    if (count>maxCount)
+            //    {
+            //        maxCount = count;
+            //        maxOutput = temp;
+            //    }
+
+            //    if (maxCount>nums.Length/2)
+            //    {
+            //        break;
+            //    }
+            //}
+            //return maxOutput;
+
+
+            //此方法避免了重复访问的问题，但是时间复杂度依然太高
+            //int temp = 0;
+            //int count = 1;
+            //int maxCount = 1;
+            //int maxOutput = 0;
+            //if (nums.Length == 1)
+            //{
+            //    return nums[0];
+            //}
+
+            //bool[] isVisited = new bool[nums.Length];
+            //for (int i = 0; i < (nums.Length + 1) / 2; i++)
+            //{
+            //    if (!isVisited[i])
+            //    {
+            //        count = 1;
+            //        temp = nums[i];
+            //        for (int j = i + 1; j < nums.Length; j++)
+            //        {
+            //            if (!isVisited[j]&&nums[j] == temp)
+            //            {
+            //                count += 1;
+            //            }
+            //        }
+
+            //        if (count > maxCount)
+            //        {
+            //            maxCount = count;
+            //            maxOutput = temp;
+            //        }
+
+            //        if (maxCount > nums.Length / 2)
+            //        {
+            //            break;
+            //        }
+            //    }
+
+            //}
+            //return maxOutput;
+
+
+        }
+
+
+
+        /// <summary>
+        /// 769. Max Chunks To Make Sorted
+        /// Given an array arr that is a permutation of [0, 1, ..., arr.length - 1], we split the array into some number of "chunks" (partitions),
+        /// and individually sort each chunk.  After concatenating them, the result equals the sorted array.
+        /// What is the most number of chunks we could have made?
+        /// 
+        /// Note:
+        /// 1.arr will have length in range [1, 10].
+        /// 2.arr[i] will be a permutation of [0, 1, ..., arr.length - 1].
+        /// 
+        /// 首先还是要利用到数组本身的序号来解决问题。
+        /// 我们增加一个数组再每个位置的最大数，然后最大数存储的结果是上一个最大数与当前数字相比较的最大值。
+        /// 那么当最大数与索引相同时，这个区间内的数组可以拆分。
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
+        public int MaxChunksToSorted(int[] arr)
+        {
+            if (arr==null||arr.Length==0)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            int[] max = new int[arr.Length];
+            max[0] = arr[0];
+            for (int i = 1; i < arr.Length; i++)
+            {
+                max[i] = Math.Max(max[i - 1], arr[i]);
+            }
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (max[i]==i)
+                {
+                    count += 1;
+                }
+            }
+
+            return count;
+        }
     }
 }
